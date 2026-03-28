@@ -2,123 +2,248 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
+<title>Inversión Inteligente</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MiniApp de Inversión</title>
 
-<!-- Telegram MiniApp SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-    body {
-        background: #0d0d0d;
-        color: #f5f5f5;
-        font-family: "Inter", sans-serif;
-        margin: 0;
-        padding: 20px;
-    }
+  :root {
+    --bg: #0a0d14;
+    --glass: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.15);
+    --accent: #00e676;
+    --accent-dark: #00b35a;
+    --text: #f5f5f5;
+    --muted: #9ea3b0;
+    --radius: 20px;
+  }
 
-    .fade-in {
-        animation: fadeIn .4s ease forwards;
-        opacity: 0;
-    }
-    @keyframes fadeIn { to { opacity: 1; } }
+  body {
+    margin: 0;
+    background: linear-gradient(160deg, #0f1422 0%, #05070b 100%);
+    font-family: "Inter", sans-serif;
+    color: var(--text);
+    overflow-x: hidden;
+  }
 
-    .card {
-        background: #1a1a1a;
-        padding: 20px;
-        border-radius: 14px;
-        margin-bottom: 20px;
-    }
+  .screen {
+    display: none;
+    padding: 24px;
+    animation: fade .35s ease forwards;
+  }
 
-    .balance {
-        font-size: 32px;
-        font-weight: bold;
-    }
+  .active { display: block; }
 
-    .profit {
-        color: #00e676;
-        margin-top: 5px;
-    }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .btn {
-        width: 100%;
-        padding: 14px;
-        border-radius: 12px;
-        margin-top: 12px;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-        transition: transform .1s ease;
-    }
+  .card {
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    border-radius: var(--radius);
+    padding: 22px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    margin-bottom: 22px;
+  }
 
-    .btn:active { transform: scale(.96); }
+  .balance {
+    font-size: 40px;
+    font-weight: 700;
+    margin: 10px 0;
+  }
 
-    .btn-primary { background: #00e676; color: #000; }
-    .btn-secondary { background: #1a1a1a; border: 1px solid #333; color: #fff; }
+  .profit {
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 500;
+  }
 
-    canvas { margin-top: 20px; }
+  .btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: transform .1s ease, box-shadow .2s ease;
+  }
+
+  .btn:active { transform: scale(.96); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #000;
+    box-shadow: 0 10px 25px rgba(0,230,118,0.35);
+  }
+
+  .btn-secondary {
+    background: var(--glass);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+  }
+
+  input {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+    font-size: 16px;
+    margin-top: 14px;
+  }
+
+  .back {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,10,10,0.7);
+    backdrop-filter: blur(14px);
+    padding: 14px;
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .nav .active-tab {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .history-item {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+  }
 </style>
 </head>
 
-<body class="fade-in">
+<body>
 
-<h2 id="username">Hola</h2>
+<!-- DASHBOARD -->
+<div id="dashboard" class="screen active">
+  <h2 id="username">Hola</h2>
 
-<div class="card">
+  <div class="card">
     <h3>Balance total</h3>
-    <p class="balance" id="balance">$0.00</p>
-    <p class="profit" id="profit">+0% este mes</p>
+    <p class="balance" id="balance">$1,250.32</p>
+    <p class="profit">+12.4% este mes</p>
+  </div>
+
+  <canvas id="chart" height="180"></canvas>
+
+  <button class="btn btn-primary" onclick="goTo('deposit')">Depositar</button>
+  <button class="btn btn-secondary" onclick="goTo('withdraw')">Retirar</button>
 </div>
 
-<canvas id="chart" height="180"></canvas>
+<!-- DEPÓSITO -->
+<div id="deposit" class="screen">
+  <h2>Depositar fondos</h2>
+  <input id="depositAmount" type="number" placeholder="Monto en USDT" />
+  <button class="btn btn-primary" onclick="confirmDeposit()">Confirmar depósito</button>
+  <div class="back" onclick="goTo('dashboard')">Volver</div>
+</div>
 
-<button class="btn btn-primary" onclick="deposit()">Depositar</button>
-<button class="btn btn-secondary" onclick="withdraw()">Retirar</button>
+<!-- RETIRO -->
+<div id="withdraw" class="screen">
+  <h2>Retirar fondos</h2>
+  <input id="withdrawAmount" type="number" placeholder="Monto en USDT" />
+  <button class="btn btn-primary" onclick="confirmWithdraw()">Retirar ahora</button>
+  <div class="back" onclick="goTo('dashboard')">Volver</div>
+</div>
+
+<!-- HISTORIAL -->
+<div id="history" class="screen">
+  <h2>Historial</h2>
+
+  <div class="card">
+    <div class="history-item">• DCA ejecutado – 5% – 0.12 BNB</div>
+    <div class="history-item">• Staking activado – 70%</div>
+    <div class="history-item">• Depósito – 1.0 BNB</div>
+    <div class="history-item">• Toma de ganancias – 10%</div>
+  </div>
+
+  <div class="back" onclick="goTo('dashboard')">Volver</div>
+</div>
+
+<!-- NAVEGACIÓN -->
+<div class="nav">
+  <button onclick="goTo('dashboard')" id="tab-dashboard" class="active-tab">Inicio</button>
+  <button onclick="goTo('history')" id="tab-history">Historial</button>
+</div>
 
 <script>
-    // Inicializar Telegram WebApp
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+  const tg = window.Telegram.WebApp;
+  tg.expand();
 
-    // Mostrar nombre del usuario
-    const user = tg.initDataUnsafe?.user;
-    document.getElementById("username").innerText = "Hola, " + (user?.first_name || "inversionista");
+  const user = tg.initDataUnsafe?.user;
+  if (user) {
+    document.getElementById("username").innerText = "Hola, " + user.first_name;
+  }
 
-    // Simulación de datos (luego se conectan al backend real)
-    document.getElementById("balance").innerText = "$1,250.32";
-    document.getElementById("profit").innerText = "+12.4% este mes";
+  function goTo(screen) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(screen).classList.add("active");
 
-    // Gráfico animado
-    const ctx = document.getElementById("chart");
-    new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: ["1", "2", "3", "4", "5", "6"],
-            datasets: [{
-                data: [1000, 1020, 1040, 1080, 1100, 1250],
-                borderColor: "#00e676",
-                borderWidth: 2,
-                tension: 0.3
-            }]
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            animation: { duration: 800 },
-            scales: { x: { display: false }, y: { display: false } }
-        }
-    });
+    document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active-tab"));
+    if (screen === "dashboard") document.getElementById("tab-dashboard").classList.add("active-tab");
+    if (screen === "history") document.getElementById("tab-history").classList.add("active-tab");
+  }
 
-    // Acciones
-    function deposit() {
-        tg.showAlert("Función de depósito conectada al backend.");
+  function confirmDeposit() {
+    const amount = document.getElementById("depositAmount").value;
+    if (!amount) return tg.showAlert("Ingresa un monto válido");
+    tg.showAlert("Depósito enviado: " + amount + " USDT");
+    goTo("dashboard");
+  }
+
+  function confirmWithdraw() {
+    const amount = document.getElementById("withdrawAmount").value;
+    if (!amount) return tg.showAlert("Ingresa un monto válido");
+    tg.showAlert("Retiro solicitado: " + amount + " USDT");
+    goTo("dashboard");
+  }
+
+  new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+      labels: ["1", "2", "3", "4", "5", "6"],
+      datasets: [{
+        data: [1000, 1020, 1040, 1080, 1100, 1250],
+        borderColor: "#00e676",
+        borderWidth: 3,
+        tension: 0.35,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { display: false }, y: { display: false } }
     }
-
-    function withdraw() {
-        tg.showAlert("Función de retiro conectada al backend.");
-    }
+  });
 </script>
 
 </body>
