@@ -2,150 +2,179 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InV_bot Terminal VIP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InV_bot Advanced Terminal</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@200;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;800&family=Inter:wght@300;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #D4AF37;
-            --black: #050505;
-            --card-bg: rgba(255, 255, 255, 0.02);
-            --border: rgba(212, 175, 55, 0.2);
+            --bg: #050505;
+            --card: rgba(255, 255, 255, 0.03);
+            --border: rgba(212, 175, 55, 0.15);
+            --accent-green: #00ff88;
         }
 
         body {
-            background-color: var(--black);
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .magazine-header {
-            padding: 45px 20px 25px;
-            text-align: center;
-            border-bottom: 0.5px solid var(--border);
-            margin-bottom: 35px;
-        }
-
-        .magazine-header h1 {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.8rem;
-            letter-spacing: 12px;
-            margin: 0;
-            font-weight: 700;
-            text-transform: uppercase;
+            background-color: var(--bg);
             color: white;
-        }
-
-        .magazine-header p {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            color: var(--gold);
-            margin-top: 8px;
-            letter-spacing: 2px;
-        }
-
-        .main-container {
-            padding: 0 25px;
-            flex-grow: 1;
-        }
-
-        .balance-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            padding: 50px 20px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
-        }
-
-        .label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: #888;
-            margin-bottom: 20px;
-        }
-
-        .amount {
-            font-size: 3.8rem;
-            font-weight: 200;
-            margin: 10px 0;
-            letter-spacing: -3px;
             font-family: 'Inter', sans-serif;
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column;
+            gap: 20px;
         }
 
-        .profit-badge {
+        /* Header Tech */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .logo-tech {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800; letter-spacing: -1px;
             color: var(--gold);
-            padding: 8px 0;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            display: block;
-            margin-top: 15px;
-            border-top: 0.5px solid rgba(255,255,255,0.1);
         }
 
-        .btn-main {
-            background: white;
-            color: black;
-            border: none;
-            padding: 20px;
-            width: 100%;
-            margin-top: 40px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-size: 0.75rem;
-            transition: 0.3s;
+        .status-dot {
+            font-size: 0.6rem; text-transform: uppercase;
+            letter-spacing: 2px; display: flex; align-items: center; gap: 5px;
         }
 
-        .footer-logo {
-            padding: 40px;
-            text-align: center;
-            opacity: 0.4;
-            font-size: 0.6rem;
-            letter-spacing: 6px;
-            text-transform: uppercase;
+        .pulse {
+            width: 8px; height: 8px; background: var(--accent-green);
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent-green);
+            animation: blink 1s infinite;
         }
+
+        /* Main Portfolio */
+        .portfolio-card {
+            background: linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(0,0,0,1) 100%);
+            border: 1px solid var(--border);
+            padding: 30px 20px; border-radius: 4px;
+            text-align: center; position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-card::before {
+            content: ""; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);
+        }
+
+        .main-balance {
+            font-size: 3rem; font-weight: 900; letter-spacing: -2px;
+            margin: 10px 0; font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Grid de Estadísticas */
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+
+        .stat-item {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 15px; border-radius: 2px;
+        }
+
+        .stat-label { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1rem; font-weight: 600; margin-top: 5px; color: var(--gold); }
+
+        /* Panel de Acciones */
+        .action-menu {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+        }
+
+        .action-btn {
+            background: transparent; border: 1px solid #333; color: white;
+            padding: 15px 5px; border-radius: 4px; font-size: 0.65rem;
+            text-transform: uppercase; font-weight: 700; letter-spacing: 1px;
+            transition: 0.2s; cursor: pointer;
+        }
+
+        .action-btn:active { background: white; color: black; border-color: white; }
+        .btn-gold { background: var(--gold); color: black; border: none; }
+
+        /* Historial */
+        .history-section {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 20px; border-radius: 4px; flex-grow: 1;
+        }
+
+        .history-title {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px;
+        }
+
+        .transaction {
+            display: flex; justify-content: space-between; font-size: 0.8rem;
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 0.5px solid #111;
+        }
+
+        .tx-plus { color: var(--accent-green); font-weight: 600; }
+
+        @keyframes blink { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
-    <div class="magazine-header">
-        <h1>InV_bot</h1>
-        <p>Private Digital Assets • Edition 2026</p>
+    <div class="header">
+        <div class="logo-tech">InV_bot // v2.0</div>
+        <div class="status-dot"><div class="pulse"></div> LIVE NETWORK</div>
     </div>
 
-    <div class="main-container">
-        <div class="balance-card">
-            <div class="label">Current Valuation</div>
-            <div id="balance" class="amount">$1,000.00</div>
-            <span class="profit-badge">Verified +1.0% Daily</span>
+    <div class="portfolio-card">
+        <div class="stat-label">Total Asset Value (USDT)</div>
+        <div class="main-balance" id="balance">$1,000.0000</div>
+        <div class="stat-label" style="color: var(--accent-green);">+1.0% DAILY COMPOUND</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-label">Affiliates</div>
+            <div class="stat-value">12 Members</div>
         </div>
-
-        <button class="btn-main" onclick="Telegram.WebApp.close()">Secure Exit</button>
+        <div class="stat-item">
+            <div class="stat-label">VIP Tier</div>
+            <div class="stat-value">GOLD ALPHA</div>
+        </div>
     </div>
 
-    <div class="footer-logo">
-        InV_bot Global Systems
+    <div class="action-menu">
+        <button class="action-btn btn-gold" onclick="alert('Depósito activado')">Deposit</button>
+        <button class="action-btn" onclick="alert('Retiro en proceso')">Withdraw</button>
+        <button class="action-btn" onclick="alert('Re-inversión exitosa')">Re-Invest</button>
     </div>
+
+    <div class="history-section">
+        <div class="history-title">Recent Activity</div>
+        <div class="transaction">
+            <span>Daily Profit (Auto)</span>
+            <span class="tx-plus">+$10.05</span>
+        </div>
+        <div class="transaction">
+            <span>Network Bonus</span>
+            <span class="tx-plus">+$2.50</span>
+        </div>
+        <div class="transaction" style="opacity: 0.5;">
+            <span>System Fee</span>
+            <span>-$0.15</span>
+        </div>
+    </div>
+
+    <button class="action-btn" style="width: 100%; border-color: var(--gold);" onclick="Telegram.WebApp.close()">TERMINATE SESSION</button>
 
     <script>
         const tele = window.Telegram.WebApp;
         tele.expand();
         tele.headerColor = '#050505';
 
-        let currentBalance = 1000.0000;
+        // Lógica de saldo en tiempo real
+        let balance = 1000.0000;
         setInterval(() => {
-            currentBalance += 0.000012; 
-            document.getElementById('balance').innerText = `$${currentBalance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4})}`;
+            balance += 0.000021; // Simulación de scalping o profit constante
+            document.getElementById('balance').innerText = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4})}`;
         }, 1000);
     </script>
 </body>
