@@ -3,139 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InV_bot Intelligence</title>
+    <title>InV_bot Intelligence Terminal</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #D4AF37; --bg: #000; --card: #111; --border: rgba(212, 175, 55, 0.2);
-            --green: #00ff88; --red: #ff4b4b;
+            --gold: #D4AF37; --bg: #000; --card: #0a0a0a; --border: rgba(212, 175, 55, 0.2);
+            --green: #00ff88; --red: #ff4b4b; --text-dim: #666;
         }
 
         body {
             background-color: var(--bg); color: white; font-family: 'Inter', sans-serif;
-            margin: 0; padding: 15px; overflow: hidden; height: 95vh; display: flex; flex-direction: column;
+            margin: 0; padding: 15px; overflow: hidden; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box;
         }
 
-        /* Portfolio */
+        /* Header & Balance */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo { font-family: 'JetBrains Mono'; color: var(--gold); font-weight: 800; font-size: 0.8rem; }
+        
         .portfolio {
             background: linear-gradient(180deg, #111 0%, #000 100%);
-            border: 1px solid var(--border); padding: 30px; text-align: center; border-radius: 8px; margin-bottom: 15px;
+            border: 1px solid var(--border); padding: 25px; text-align: center; border-radius: 12px; margin-bottom: 15px;
         }
-        .balance-value { font-size: 2.5rem; font-family: 'JetBrains Mono'; margin: 5px 0; color: white; }
+        .balance-value { font-size: 2.6rem; font-family: 'JetBrains Mono'; margin: 5px 0; letter-spacing: -1px; }
 
-        /* Botones de Filtro (Historial) */
-        .history-controls {
-            display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 5px; overflow-x: auto;
+        /* Actions Grid */
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .btn-act {
+            background: var(--card); border: 1px solid #222; color: white;
+            padding: 12px 5px; border-radius: 8px; font-size: 0.6rem;
+            text-transform: uppercase; font-weight: 800; letter-spacing: 1px;
         }
-        .filter-btn {
-            background: #111; border: 1px solid #222; color: #888;
-            padding: 8px 15px; border-radius: 20px; font-size: 0.65rem;
-            text-transform: uppercase; font-weight: 700; white-space: nowrap;
-        }
-        .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .btn-main { background: var(--gold); color: black; border: none; }
 
-        /* Lista de Historial */
+        /* History Section */
+        .history-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; padding: 0 5px;
+        }
+        .history-title { font-size: 0.65rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+        
         .history-container {
-            flex-grow: 1; background: #080808; border: 1px solid #111;
-            border-radius: 8px; padding: 15px; overflow-y: auto;
+            flex-grow: 1; background: #050505; border: 1px solid #111;
+            border-radius: 12px; padding: 15px; overflow-y: auto;
         }
         .tx-card {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid #111;
+            padding: 12px 0; border-bottom: 1px solid #111; animation: fadeIn 0.3s ease;
         }
-        .tx-info { display: flex; flex-direction: column; gap: 4px; }
-        .tx-title { font-size: 0.8rem; font-weight: 600; }
-        .tx-date { font-size: 0.6rem; color: #555; font-family: 'JetBrains Mono'; }
-        .tx-amount { font-family: 'JetBrains Mono'; font-size: 0.85rem; font-weight: 700; }
+        .tx-info { display: flex; flex-direction: column; }
+        .tx-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+        .tx-time { font-size: 0.55rem; color: var(--text-dim); font-family: 'JetBrains Mono'; }
+        .tx-val { font-family: 'JetBrains Mono'; font-size: 0.85rem; font-weight: 700; }
 
-        /* Clases de estado */
-        .type-profit { color: var(--green); }
-        .type-out { color: var(--red); }
-        .type-in { color: var(--gold); }
-
-        /* Botones Acción Principal */
-        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn {
-            padding: 15px; border-radius: 6px; font-weight: 800; font-size: 0.7rem;
-            text-transform: uppercase; letter-spacing: 1px; border: none; cursor: pointer;
+        /* Modal */
+        #modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
         }
+        .modal-box {
+            background: #111; border: 1px solid var(--gold);
+            padding: 30px; width: 85%; border-radius: 15px; text-align: center;
+        }
+        input {
+            width: 100%; background: #000; border: 1px solid #333; padding: 15px;
+            color: white; font-family: 'JetBrains Mono'; font-size: 1.5rem;
+            text-align: center; margin: 20px 0; border-radius: 8px;
+        }
+
+        .type-up { color: var(--green); }
+        .type-down { color: var(--red); }
+        .type-neutral { color: var(--gold); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="portfolio">
-        <div style="font-size: 0.6rem; letter-spacing: 2px; color: var(--gold);">AVAILABLE BALANCE</div>
-        <div class="balance-value" id="balance">$1,000.0000</div>
+    <div class="header">
+        <div class="logo">InV_bot // TERMINAL</div>
+        <div id="clock" style="font-size: 0.6rem; font-family: 'JetBrains Mono'; color: var(--text-dim);">--:--:--</div>
     </div>
 
-    <div class="history-controls">
-        <button class="filter-btn active" onclick="filterHistory('ALL', this)">All Logs</button>
-        <button class="filter-btn" onclick="filterHistory('PROFIT', this)">Profits</button>
-        <button class="filter-btn" onclick="filterHistory('DEPOSIT', this)">Deposits</button>
-        <button class="filter-btn" onclick="filterHistory('WITHDRAW', this)">Withdrawals</button>
+    <div class="portfolio">
+        <div style="font-size: 0.55rem; letter-spacing: 3px; color: var(--text-dim);">TOTAL ASSET VALUE</div>
+        <div class="balance-value" id="balance">$1,000.0000</div>
+        <div style="font-size: 0.6rem; color: var(--green);">● SYSTEM ACTIVE: +1.0% DAILY</div>
+    </div>
+
+    <div class="actions-grid">
+        <button class="btn-act btn-main" onclick="openModal('DEPOSIT')">Deposit</button>
+        <button class="btn-act" onclick="openModal('WITHDRAW')">Withdraw</button>
+        <button class="btn-act" onclick="openModal('REINVEST')">Re-Invest</button>
+    </div>
+
+    <div class="history-header">
+        <span class="history-title">Transaction Logs</span>
     </div>
 
     <div class="history-container" id="history-list">
         </div>
 
-    <div class="main-actions">
-        <button class="btn" style="background: var(--gold); color: black;">Deposit</button>
-        <button class="btn" style="background: #111; color: white; border: 1px solid #333;" onclick="Telegram.WebApp.close()">Exit</button>
+    <div id="modal">
+        <div class="modal-box">
+            <div id="m-title" style="letter-spacing: 3px; font-weight: 800; font-size: 0.8rem;">OPERATION</div>
+            <input type="number" id="m-input" placeholder="0.00" inputmode="decimal">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn-act" onclick="closeModal()">Cancel</button>
+                <button class="btn-act btn-main" onclick="processAction()">Confirm</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const tele = window.Telegram.WebApp;
         tele.expand();
 
-        // Datos de ejemplo para el historial
-        const transactions = [
-            { title: "Scalping Profit", date: "29 MAR 12:00", amount: "+$12.40", type: "PROFIT" },
-            { title: "External Deposit", date: "28 MAR 18:30", amount: "+$500.00", type: "DEPOSIT" },
-            { title: "Account Withdrawal", date: "27 MAR 09:15", amount: "-$50.00", type: "WITHDRAW" },
-            { title: "Daily Yield", date: "27 MAR 00:00", amount: "+$10.00", type: "PROFIT" },
-            { title: "Alpha Bonus", date: "26 MAR 14:20", amount: "+$5.00", type: "PROFIT" }
+        let balance = 1000.0000;
+        let activeOp = "";
+        let historyData = [
+            { name: "Initial Liquidity", time: "29 MAR 10:00:22", amount: "+1,000.00", type: "up" }
         ];
 
-        function renderHistory(filter = 'ALL') {
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+
+        function openModal(op) {
+            activeOp = op;
+            document.getElementById('m-title').innerText = op + " AMOUNT";
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('m-input').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('m-input').value = "";
+        }
+
+        function renderHistory() {
             const list = document.getElementById('history-list');
-            list.innerHTML = "";
-            
-            const filtered = filter === 'ALL' ? transactions : transactions.filter(t => t.type === filter);
-            
-            filtered.forEach(tx => {
-                const amountClass = tx.type === 'WITHDRAW' ? 'type-out' : (tx.type === 'PROFIT' ? 'type-profit' : 'type-in');
-                list.innerHTML += `
-                    <div class="tx-card">
-                        <div class="tx-info">
-                            <span class="tx-title">${tx.title}</span>
-                            <span class="tx-date">${tx.date}</span>
-                        </div>
-                        <span class="tx-amount ${amountClass}">${tx.amount}</span>
+            list.innerHTML = historyData.map(tx => `
+                <div class="tx-card">
+                    <div class="tx-info">
+                        <span class="tx-name">${tx.name}</span>
+                        <span class="tx-time">${tx.time}</span>
                     </div>
-                `;
-            });
+                    <span class="tx-val ${tx.type}">${tx.amount}</span>
+                </div>
+            `).reverse().join('');
         }
 
-        function filterHistory(type, btn) {
-            // Cambiar estado activo de los botones
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function processAction() {
+            const val = parseFloat(document.getElementById('m-input').value);
+            if (!val || val <= 0) return tele.showAlert("Invalid Amount");
+
+            const now = new Date();
+            const timeStr = `${now.getDate()} ${now.toLocaleString('en-US', {month: 'short'}).toUpperCase()} ${now.toLocaleTimeString()}`;
             
-            // Renderizar con filtro
-            renderHistory(type);
-            tele.HapticFeedback.selectionChanged();
+            let newTx = { time: timeStr };
+
+            if (activeOp === 'DEPOSIT') {
+                balance += val;
+                newTx.name = "External Deposit";
+                newTx.amount = "+" + val.toLocaleString();
+                newTx.type = "up";
+            } else if (activeOp === 'WITHDRAW') {
+                if (val > balance) return tele.showAlert("Insufficient Funds");
+                balance -= val;
+                newTx.name = "Account Withdrawal";
+                newTx.amount = "-" + val.toLocaleString();
+                newTx.type = "down";
+            } else if (activeOp === 'REINVEST') {
+                newTx.name = "Compound Re-invest";
+                newTx.amount = "±" + val.toLocaleString();
+                newTx.type = "neutral";
+                tele.showScanQrPopup({ text: "Verifying reinvestment..." });
+                setTimeout(() => tele.closeScanQrPopup(), 2000);
+            }
+
+            historyData.push(newTx);
+            renderHistory();
+            closeModal();
+            tele.HapticFeedback.notificationOccurred('success');
         }
 
-        // Inicializar
-        renderHistory();
-
-        // Crecimiento visual del balance
-        let balance = 1000.00;
+        // Simulación de centavos fluyendo
         setInterval(() => {
-            balance += 0.000022;
+            balance += 0.000015;
             document.getElementById('balance').innerText = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4})}`;
         }, 1000);
+
+        renderHistory();
     </script>
 </body>
 </html>
