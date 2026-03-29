@@ -1,250 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>Inversión Inteligente</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InV_bot Terminal VIP</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@200;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --black: #050505;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --border: rgba(212, 175, 55, 0.2);
+        }
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        body {
+            background-color: var(--black);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-<style>
-  :root {
-    --bg: #0a0d14;
-    --glass: rgba(255,255,255,0.08);
-    --glass-border: rgba(255,255,255,0.15);
-    --accent: #00e676;
-    --accent-dark: #00b35a;
-    --text: #f5f5f5;
-    --muted: #9ea3b0;
-    --radius: 20px;
-  }
+        .magazine-header {
+            padding: 45px 20px 25px;
+            text-align: center;
+            border-bottom: 0.5px solid var(--border);
+            margin-bottom: 35px;
+        }
 
-  body {
-    margin: 0;
-    background: linear-gradient(160deg, #0f1422 0%, #05070b 100%);
-    font-family: "Inter", sans-serif;
-    color: var(--text);
-    overflow-x: hidden;
-  }
+        .magazine-header h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 12px;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: white;
+        }
 
-  .screen {
-    display: none;
-    padding: 24px;
-    animation: fade .35s ease forwards;
-  }
+        .magazine-header p {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: var(--gold);
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
 
-  .active { display: block; }
+        .main-container {
+            padding: 0 25px;
+            flex-grow: 1;
+        }
 
-  @keyframes fade {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+        .balance-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 50px 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+        }
 
-  .card {
-    background: var(--glass);
-    backdrop-filter: blur(18px);
-    border-radius: var(--radius);
-    padding: 22px;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
-    margin-bottom: 22px;
-  }
+        .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #888;
+            margin-bottom: 20px;
+        }
 
-  .balance {
-    font-size: 40px;
-    font-weight: 700;
-    margin: 10px 0;
-  }
+        .amount {
+            font-size: 3.8rem;
+            font-weight: 200;
+            margin: 10px 0;
+            letter-spacing: -3px;
+            font-family: 'Inter', sans-serif;
+        }
 
-  .profit {
-    color: var(--accent);
-    font-size: 16px;
-    font-weight: 500;
-  }
+        .profit-badge {
+            color: var(--gold);
+            padding: 8px 0;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-top: 15px;
+            border-top: 0.5px solid rgba(255,255,255,0.1);
+        }
 
-  .btn {
-    width: 100%;
-    padding: 16px;
-    border-radius: var(--radius);
-    border: none;
-    font-size: 17px;
-    cursor: pointer;
-    margin-top: 14px;
-    transition: transform .1s ease, box-shadow .2s ease;
-  }
+        .btn-main {
+            background: white;
+            color: black;
+            border: none;
+            padding: 20px;
+            width: 100%;
+            margin-top: 40px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
 
-  .btn:active { transform: scale(.96); }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-    color: #000;
-    box-shadow: 0 10px 25px rgba(0,230,118,0.35);
-  }
-
-  .btn-secondary {
-    background: var(--glass);
-    color: var(--text);
-    border: 1px solid var(--glass-border);
-  }
-
-  input {
-    width: 100%;
-    padding: 16px;
-    border-radius: 14px;
-    border: none;
-    background: rgba(255,255,255,0.1);
-    color: var(--text);
-    font-size: 16px;
-    margin-top: 14px;
-  }
-
-  .back {
-    text-align: center;
-    margin-top: 20px;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 15px;
-  }
-
-  .nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(10,10,10,0.7);
-    backdrop-filter: blur(14px);
-    padding: 14px;
-    display: flex;
-    justify-content: space-around;
-    border-top: 1px solid var(--glass-border);
-  }
-
-  .nav button {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  .nav .active-tab {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .history-item {
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 15px;
-  }
-</style>
+        .footer-logo {
+            padding: 40px;
+            text-align: center;
+            opacity: 0.4;
+            font-size: 0.6rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="screen active">
-  <h2 id="username">Hola</h2>
+    <div class="magazine-header">
+        <h1>InV_bot</h1>
+        <p>Private Digital Assets • Edition 2026</p>
+    </div>
 
-  <div class="card">
-    <h3>Balance total</h3>
-    <p class="balance" id="balance">$1,250.32</p>
-    <p class="profit">+12.4% este mes</p>
-  </div>
+    <div class="main-container">
+        <div class="balance-card">
+            <div class="label">Current Valuation</div>
+            <div id="balance" class="amount">$1,000.00</div>
+            <span class="profit-badge">Verified +1.0% Daily</span>
+        </div>
 
-  <canvas id="chart" height="180"></canvas>
+        <button class="btn-main" onclick="Telegram.WebApp.close()">Secure Exit</button>
+    </div>
 
-  <button class="btn btn-primary" onclick="goTo('deposit')">Depositar</button>
-  <button class="btn btn-secondary" onclick="goTo('withdraw')">Retirar</button>
-</div>
+    <div class="footer-logo">
+        InV_bot Global Systems
+    </div>
 
-<!-- DEPÓSITO -->
-<div id="deposit" class="screen">
-  <h2>Depositar fondos</h2>
-  <input id="depositAmount" type="number" placeholder="Monto en USDT" />
-  <button class="btn btn-primary" onclick="confirmDeposit()">Confirmar depósito</button>
-  <div class="back" onclick="goTo('dashboard')">Volver</div>
-</div>
+    <script>
+        const tele = window.Telegram.WebApp;
+        tele.expand();
+        tele.headerColor = '#050505';
 
-<!-- RETIRO -->
-<div id="withdraw" class="screen">
-  <h2>Retirar fondos</h2>
-  <input id="withdrawAmount" type="number" placeholder="Monto en USDT" />
-  <button class="btn btn-primary" onclick="confirmWithdraw()">Retirar ahora</button>
-  <div class="back" onclick="goTo('dashboard')">Volver</div>
-</div>
-
-<!-- HISTORIAL -->
-<div id="history" class="screen">
-  <h2>Historial</h2>
-
-  <div class="card">
-    <div class="history-item">• DCA ejecutado – 5% – 0.12 BNB</div>
-    <div class="history-item">• Staking activado – 70%</div>
-    <div class="history-item">• Depósito – 1.0 BNB</div>
-    <div class="history-item">• Toma de ganancias – 10%</div>
-  </div>
-
-  <div class="back" onclick="goTo('dashboard')">Volver</div>
-</div>
-
-<!-- NAVEGACIÓN -->
-<div class="nav">
-  <button onclick="goTo('dashboard')" id="tab-dashboard" class="active-tab">Inicio</button>
-  <button onclick="goTo('history')" id="tab-history">Historial</button>
-</div>
-
-<script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
-
-  const user = tg.initDataUnsafe?.user;
-  if (user) {
-    document.getElementById("username").innerText = "Hola, " + user.first_name;
-  }
-
-  function goTo(screen) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(screen).classList.add("active");
-
-    document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active-tab"));
-    if (screen === "dashboard") document.getElementById("tab-dashboard").classList.add("active-tab");
-    if (screen === "history") document.getElementById("tab-history").classList.add("active-tab");
-  }
-
-  function confirmDeposit() {
-    const amount = document.getElementById("depositAmount").value;
-    if (!amount) return tg.showAlert("Ingresa un monto válido");
-    tg.showAlert("Depósito enviado: " + amount + " USDT");
-    goTo("dashboard");
-  }
-
-  function confirmWithdraw() {
-    const amount = document.getElementById("withdrawAmount").value;
-    if (!amount) return tg.showAlert("Ingresa un monto válido");
-    tg.showAlert("Retiro solicitado: " + amount + " USDT");
-    goTo("dashboard");
-  }
-
-  new Chart(document.getElementById("chart"), {
-    type: "line",
-    data: {
-      labels: ["1", "2", "3", "4", "5", "6"],
-      datasets: [{
-        data: [1000, 1020, 1040, 1080, 1100, 1250],
-        borderColor: "#00e676",
-        borderWidth: 3,
-        tension: 0.35,
-        pointRadius: 0
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: { x: { display: false }, y: { display: false } }
-    }
-  });
-</script>
-
+        let currentBalance = 1000.0000;
+        setInterval(() => {
+            currentBalance += 0.000012; 
+            document.getElementById('balance').innerText = `$${currentBalance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4})}`;
+        }, 1000);
+    </script>
 </body>
 </html>
