@@ -3,114 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InV_bot Intelligence Terminal</title>
+    <title>InV_bot x CoinEx Style</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #D4AF37; --bg: #000; --card: #0a0a0a; --border: rgba(212, 175, 55, 0.2);
-            --green: #00ff88; --red: #ff4b4b; --text-dim: #666;
+            --coinex-green: #00BD9A;
+            --coinex-red: #F6465D;
+            --bg-main: #12161C;
+            --bg-card: #1E2329;
+            --text-main: #EAECEF;
+            --text-dim: #848E9C;
+            --border: #2B3139;
         }
 
         body {
-            background-color: var(--bg); color: white; font-family: 'Inter', sans-serif;
-            margin: 0; padding: 15px; overflow: hidden; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 16px;
+            display: flex; flex-direction: column;
+            height: 100vh; box-sizing: border-box;
         }
 
-        /* Header & Balance */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo { font-family: 'JetBrains Mono'; color: var(--gold); font-weight: 800; font-size: 0.8rem; }
-        
-        .portfolio {
-            background: linear-gradient(180deg, #111 0%, #000 100%);
-            border: 1px solid var(--border); padding: 25px; text-align: center; border-radius: 12px; margin-bottom: 15px;
-        }
-        .balance-value { font-size: 2.6rem; font-family: 'JetBrains Mono'; margin: 5px 0; letter-spacing: -1px; }
-
-        /* Actions Grid */
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        .btn-act {
-            background: var(--card); border: 1px solid #222; color: white;
-            padding: 12px 5px; border-radius: 8px; font-size: 0.6rem;
-            text-transform: uppercase; font-weight: 800; letter-spacing: 1px;
-        }
-        .btn-main { background: var(--gold); color: black; border: none; }
-
-        /* History Section */
-        .history-header {
+        /* Header Estilo Exchange */
+        .header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; padding: 0 5px;
+            margin-bottom: 20px;
         }
-        .history-title { font-size: 0.65rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
-        
-        .history-container {
-            flex-grow: 1; background: #050505; border: 1px solid #111;
-            border-radius: 12px; padding: 15px; overflow-y: auto;
-        }
-        .tx-card {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid #111; animation: fadeIn 0.3s ease;
-        }
-        .tx-info { display: flex; flex-direction: column; }
-        .tx-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
-        .tx-time { font-size: 0.55rem; color: var(--text-dim); font-family: 'JetBrains Mono'; }
-        .tx-val { font-family: 'JetBrains Mono'; font-size: 0.85rem; font-weight: 700; }
+        .user-id { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+        .market-status { font-size: 0.7rem; color: var(--coinex-green); background: rgba(0, 189, 154, 0.1); padding: 4px 8px; border-radius: 4px; }
 
-        /* Modal */
+        /* Wallet Card */
+        .wallet-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; }
+        .balance-row { display: flex; align-items: baseline; gap: 8px; }
+        .main-balance { font-size: 2.2rem; font-weight: 700; font-family: 'Inter'; }
+        .currency { color: var(--text-dim); font-size: 1rem; }
+
+        /* Actions - Estilo Botones CoinEx */
+        .action-row {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+            margin-bottom: 24px;
+        }
+        .btn-ce {
+            border-radius: 8px; border: none; padding: 12px;
+            font-weight: 600; font-size: 0.8rem; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-deposit { background-color: var(--coinex-green); color: #000; }
+        .btn-withdraw { background-color: #2B3139; color: var(--text-main); }
+        .btn-reinvest { background-color: rgba(0, 189, 154, 0.15); color: var(--coinex-green); }
+
+        /* History List */
+        .section-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; color: var(--text-main); }
+        .history-list {
+            flex-grow: 1; overflow-y: auto;
+            background-color: var(--bg-card);
+            border-radius: 12px 12px 0 0;
+            padding: 16px; border: 1px solid var(--border); border-bottom: none;
+        }
+        .tx-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid var(--border);
+        }
+        .tx-desc { font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; display: block; }
+        .tx-date { font-size: 0.7rem; color: var(--text-dim); }
+        .tx-amount { font-weight: 600; font-size: 0.9rem; }
+
+        /* Modal Estilo CoinEx */
         #modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100;
         }
         .modal-box {
-            background: #111; border: 1px solid var(--gold);
-            padding: 30px; width: 85%; border-radius: 15px; text-align: center;
+            background: var(--bg-card); border-radius: 16px; padding: 24px;
+            width: 85%; border: 1px solid var(--border);
         }
-        input {
-            width: 100%; background: #000; border: 1px solid #333; padding: 15px;
-            color: white; font-family: 'JetBrains Mono'; font-size: 1.5rem;
-            text-align: center; margin: 20px 0; border-radius: 8px;
+        .modal-input {
+            width: 100%; background: var(--bg-main); border: 1px solid var(--border);
+            border-radius: 8px; padding: 14px; color: white; font-size: 1.2rem;
+            margin: 16px 0; box-sizing: border-box; outline: none;
         }
+        .modal-input:focus { border-color: var(--coinex-green); }
 
-        .type-up { color: var(--green); }
-        .type-down { color: var(--red); }
-        .type-neutral { color: var(--gold); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .up { color: var(--coinex-green); }
+        .down { color: var(--coinex-red); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">InV_bot // TERMINAL</div>
-        <div id="clock" style="font-size: 0.6rem; font-family: 'JetBrains Mono'; color: var(--text-dim);">--:--:--</div>
+        <div class="user-id">Sibanicú Terminal</div>
+        <div class="market-status">Market Open</div>
     </div>
 
-    <div class="portfolio">
-        <div style="font-size: 0.55rem; letter-spacing: 3px; color: var(--text-dim);">TOTAL ASSET VALUE</div>
-        <div class="balance-value" id="balance">$1,000.0000</div>
-        <div style="font-size: 0.6rem; color: var(--green);">● SYSTEM ACTIVE: +1.0% DAILY</div>
+    <div class="wallet-card">
+        <div class="label">Total Equity Value (USDT)</div>
+        <div class="balance-row">
+            <span class="main-balance" id="balance">1,000.0000</span>
+            <span class="currency">USDT</span>
+        </div>
+        <div style="margin-top: 10px; font-size: 0.75rem; color: var(--coinex-green);">
+            ≈ $1,000.00 USD <span style="margin-left: 5px;">↑ 1.24%</span>
+        </div>
     </div>
 
-    <div class="actions-grid">
-        <button class="btn-act btn-main" onclick="openModal('DEPOSIT')">Deposit</button>
-        <button class="btn-act" onclick="openModal('WITHDRAW')">Withdraw</button>
-        <button class="btn-act" onclick="openModal('REINVEST')">Re-Invest</button>
+    <div class="action-row">
+        <button class="btn-ce btn-deposit" onclick="openModal('DEPOSIT')">Deposit</button>
+        <button class="btn-ce btn-withdraw" onclick="openModal('WITHDRAW')">Withdraw</button>
+        <button class="btn-ce btn-reinvest" onclick="openModal('REINVEST')">Re-invest</button>
     </div>
 
-    <div class="history-header">
-        <span class="history-title">Transaction Logs</span>
-    </div>
-
-    <div class="history-container" id="history-list">
+    <div class="section-title">Asset History</div>
+    <div class="history-list" id="history-list">
         </div>
 
     <div id="modal">
         <div class="modal-box">
-            <div id="m-title" style="letter-spacing: 3px; font-weight: 800; font-size: 0.8rem;">OPERATION</div>
-            <input type="number" id="m-input" placeholder="0.00" inputmode="decimal">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn-act" onclick="closeModal()">Cancel</button>
-                <button class="btn-act btn-main" onclick="processAction()">Confirm</button>
+            <div id="m-title" style="font-weight: 600; font-size: 1rem;">Transaction</div>
+            <input type="number" id="m-input" class="modal-input" placeholder="Min. 10.00" inputmode="decimal">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button class="btn-ce btn-withdraw" onclick="closeModal()">Cancel</button>
+                <button class="btn-ce btn-deposit" onclick="processAction()">Confirm</button>
             </div>
         </div>
     </div>
@@ -118,82 +139,70 @@
     <script>
         const tele = window.Telegram.WebApp;
         tele.expand();
+        tele.headerColor = '#12161C';
 
         let balance = 1000.0000;
         let activeOp = "";
         let historyData = [
-            { name: "Initial Liquidity", time: "29 MAR 10:00:22", amount: "+1,000.00", type: "up" }
+            { name: "Daily Staking Reward", time: "2026-03-29 10:00", amount: "+4.20", type: "up" },
+            { name: "System Deposit", time: "2026-03-28 15:45", amount: "+1,000.00", type: "up" }
         ];
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString();
-        }
-        setInterval(updateClock, 1000);
 
         function openModal(op) {
             activeOp = op;
-            document.getElementById('m-title').innerText = op + " AMOUNT";
+            document.getElementById('m-title').innerText = op + " USDT";
             document.getElementById('modal').style.display = 'flex';
-            document.getElementById('m-input').focus();
         }
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-            document.getElementById('m-input').value = "";
-        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
         function renderHistory() {
             const list = document.getElementById('history-list');
             list.innerHTML = historyData.map(tx => `
-                <div class="tx-card">
-                    <div class="tx-info">
-                        <span class="tx-name">${tx.name}</span>
-                        <span class="tx-time">${tx.time}</span>
+                <div class="tx-item">
+                    <div>
+                        <span class="tx-desc">${tx.name}</span>
+                        <span class="tx-date">${tx.time}</span>
                     </div>
-                    <span class="tx-val ${tx.type}">${tx.amount}</span>
+                    <span class="tx-amount ${tx.type}">${tx.amount}</span>
                 </div>
             `).reverse().join('');
         }
 
         function processAction() {
             const val = parseFloat(document.getElementById('m-input').value);
-            if (!val || val <= 0) return tele.showAlert("Invalid Amount");
+            if (!val || val <= 0) return;
 
             const now = new Date();
-            const timeStr = `${now.getDate()} ${now.toLocaleString('en-US', {month: 'short'}).toUpperCase()} ${now.toLocaleTimeString()}`;
-            
+            const timeStr = now.toISOString().slice(0, 16).replace('T', ' ');
             let newTx = { time: timeStr };
 
             if (activeOp === 'DEPOSIT') {
                 balance += val;
-                newTx.name = "External Deposit";
-                newTx.amount = "+" + val.toLocaleString();
+                newTx.name = "USDT Deposit";
+                newTx.amount = "+" + val.toFixed(2);
                 newTx.type = "up";
             } else if (activeOp === 'WITHDRAW') {
-                if (val > balance) return tele.showAlert("Insufficient Funds");
+                if (val > balance) return tele.showAlert("Balance insuficiente");
                 balance -= val;
-                newTx.name = "Account Withdrawal";
-                newTx.amount = "-" + val.toLocaleString();
+                newTx.name = "USDT Withdrawal";
+                newTx.amount = "-" + val.toFixed(2);
                 newTx.type = "down";
-            } else if (activeOp === 'REINVEST') {
-                newTx.name = "Compound Re-invest";
-                newTx.amount = "±" + val.toLocaleString();
-                newTx.type = "neutral";
-                tele.showScanQrPopup({ text: "Verifying reinvestment..." });
-                setTimeout(() => tele.closeScanQrPopup(), 2000);
+            } else {
+                newTx.name = "Re-investment";
+                newTx.amount = "Done";
+                newTx.type = "up";
             }
 
             historyData.push(newTx);
             renderHistory();
             closeModal();
-            tele.HapticFeedback.notificationOccurred('success');
+            tele.HapticFeedback.impactOccurred('medium');
         }
 
-        // Simulación de centavos fluyendo
         setInterval(() => {
-            balance += 0.000015;
-            document.getElementById('balance').innerText = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4})}`;
+            balance += 0.000012;
+            document.getElementById('balance').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4});
         }, 1000);
 
         renderHistory();
