@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InV_bot x CoinEx Style</title>
+    <title>InV_bot Terminal</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
             --coinex-green: #00BD9A;
@@ -26,13 +26,22 @@
             height: 100vh; box-sizing: border-box;
         }
 
-        /* Header Estilo Exchange */
+        /* Header con Reloj */
         .header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px;
         }
-        .user-id { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
-        .market-status { font-size: 0.7rem; color: var(--coinex-green); background: rgba(0, 189, 154, 0.1); padding: 4px 8px; border-radius: 4px; }
+        .brand-name { font-size: 1rem; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; }
+        .live-clock { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.8rem; 
+            color: var(--coinex-green); 
+            background: rgba(0, 189, 154, 0.1); 
+            padding: 4px 10px; 
+            border-radius: 6px;
+            min-width: 80px;
+            text-align: center;
+        }
 
         /* Wallet Card */
         .wallet-card {
@@ -42,12 +51,12 @@
             margin-bottom: 16px;
             border: 1px solid var(--border);
         }
-        .label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; }
+        .label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .balance-row { display: flex; align-items: baseline; gap: 8px; }
-        .main-balance { font-size: 2.2rem; font-weight: 700; font-family: 'Inter'; }
+        .main-balance { font-size: 2.2rem; font-weight: 700; }
         .currency { color: var(--text-dim); font-size: 1rem; }
 
-        /* Actions - Estilo Botones CoinEx */
+        /* Botones CoinEx Style */
         .action-row {
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
             margin-bottom: 24px;
@@ -55,43 +64,44 @@
         .btn-ce {
             border-radius: 8px; border: none; padding: 12px;
             font-weight: 600; font-size: 0.8rem; cursor: pointer;
-            transition: opacity 0.2s;
+            transition: 0.2s;
         }
         .btn-deposit { background-color: var(--coinex-green); color: #000; }
         .btn-withdraw { background-color: #2B3139; color: var(--text-main); }
-        .btn-reinvest { background-color: rgba(0, 189, 154, 0.15); color: var(--coinex-green); }
+        .btn-reinvest { background-color: rgba(0, 189, 154, 0.1); color: var(--coinex-green); border: 1px solid rgba(0, 189, 154, 0.2); }
+        .btn-ce:active { opacity: 0.7; transform: scale(0.98); }
 
-        /* History List */
-        .section-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; color: var(--text-main); }
+        /* History */
+        .section-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; }
         .history-list {
             flex-grow: 1; overflow-y: auto;
             background-color: var(--bg-card);
             border-radius: 12px 12px 0 0;
-            padding: 16px; border: 1px solid var(--border); border-bottom: none;
+            padding: 16px; border: 1px solid var(--border);
         }
         .tx-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 14px 0; border-bottom: 1px solid var(--border);
         }
         .tx-desc { font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; display: block; }
-        .tx-date { font-size: 0.7rem; color: var(--text-dim); }
-        .tx-amount { font-weight: 600; font-size: 0.9rem; }
+        .tx-date { font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains Mono'; }
+        .tx-amount { font-weight: 600; font-size: 0.9rem; font-family: 'JetBrains Mono'; }
 
-        /* Modal Estilo CoinEx */
+        /* Modal */
         #modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 100;
         }
         .modal-box {
             background: var(--bg-card); border-radius: 16px; padding: 24px;
-            width: 85%; border: 1px solid var(--border);
+            width: 85%; border: 1px solid var(--border); text-align: center;
         }
         .modal-input {
             width: 100%; background: var(--bg-main); border: 1px solid var(--border);
-            border-radius: 8px; padding: 14px; color: white; font-size: 1.2rem;
-            margin: 16px 0; box-sizing: border-box; outline: none;
+            border-radius: 8px; padding: 14px; color: white; font-size: 1.5rem;
+            margin: 20px 0; box-sizing: border-box; text-align: center;
         }
-        .modal-input:focus { border-color: var(--coinex-green); }
 
         .up { color: var(--coinex-green); }
         .down { color: var(--coinex-red); }
@@ -100,18 +110,18 @@
 <body>
 
     <div class="header">
-        <div class="user-id">Sibanicú Terminal</div>
-        <div class="market-status">Market Open</div>
+        <div class="brand-name">InV_bot</div>
+        <div class="live-clock" id="clock">00:00:00</div>
     </div>
 
     <div class="wallet-card">
-        <div class="label">Total Equity Value (USDT)</div>
+        <div class="label">Total Assets</div>
         <div class="balance-row">
             <span class="main-balance" id="balance">1,000.0000</span>
             <span class="currency">USDT</span>
         </div>
         <div style="margin-top: 10px; font-size: 0.75rem; color: var(--coinex-green);">
-            ≈ $1,000.00 USD <span style="margin-left: 5px;">↑ 1.24%</span>
+            Profit Today: +1.24% <span style="margin-left: 5px;">↑</span>
         </div>
     </div>
 
@@ -121,14 +131,13 @@
         <button class="btn-ce btn-reinvest" onclick="openModal('REINVEST')">Re-invest</button>
     </div>
 
-    <div class="section-title">Asset History</div>
-    <div class="history-list" id="history-list">
-        </div>
+    <div class="section-title">Recent Transactions</div>
+    <div class="history-list" id="history-list"></div>
 
     <div id="modal">
         <div class="modal-box">
-            <div id="m-title" style="font-weight: 600; font-size: 1rem;">Transaction</div>
-            <input type="number" id="m-input" class="modal-input" placeholder="Min. 10.00" inputmode="decimal">
+            <div id="m-title" style="font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Transaction</div>
+            <input type="number" id="m-input" class="modal-input" placeholder="0.00">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <button class="btn-ce btn-withdraw" onclick="closeModal()">Cancel</button>
                 <button class="btn-ce btn-deposit" onclick="processAction()">Confirm</button>
@@ -139,18 +148,25 @@
     <script>
         const tele = window.Telegram.WebApp;
         tele.expand();
-        tele.headerColor = '#12161C';
 
         let balance = 1000.0000;
         let activeOp = "";
         let historyData = [
-            { name: "Daily Staking Reward", time: "2026-03-29 10:00", amount: "+4.20", type: "up" },
-            { name: "System Deposit", time: "2026-03-28 15:45", amount: "+1,000.00", type: "up" }
+            { name: "Welcome Bonus", time: "2026-03-29 10:00:00", amount: "+5.00", type: "up" }
         ];
+
+        // Reloj en tiempo real
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('es-ES', { hour12: false });
+            document.getElementById('clock').innerText = time;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         function openModal(op) {
             activeOp = op;
-            document.getElementById('m-title').innerText = op + " USDT";
+            document.getElementById('m-title').innerText = op;
             document.getElementById('modal').style.display = 'flex';
         }
 
@@ -174,8 +190,8 @@
             if (!val || val <= 0) return;
 
             const now = new Date();
-            const timeStr = now.toISOString().slice(0, 16).replace('T', ' ');
-            let newTx = { time: timeStr };
+            const dateStr = now.toISOString().split('T')[0] + " " + now.toLocaleTimeString();
+            let newTx = { time: dateStr };
 
             if (activeOp === 'DEPOSIT') {
                 balance += val;
@@ -190,18 +206,18 @@
                 newTx.type = "down";
             } else {
                 newTx.name = "Re-investment";
-                newTx.amount = "Done";
+                newTx.amount = "DONE";
                 newTx.type = "up";
             }
 
             historyData.push(newTx);
             renderHistory();
             closeModal();
-            tele.HapticFeedback.impactOccurred('medium');
+            tele.HapticFeedback.notificationOccurred('success');
         }
 
         setInterval(() => {
-            balance += 0.000012;
+            balance += 0.000015;
             document.getElementById('balance').innerText = balance.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4});
         }, 1000);
 
